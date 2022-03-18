@@ -1,8 +1,6 @@
 param scriptLocation string
 param winvmssname string
 
-
-
 resource vmss 'Microsoft.Compute/virtualMachineScaleSets@2021-11-01' existing = {
   name: winvmssname
 }
@@ -10,12 +8,9 @@ resource vmss_extension 'Microsoft.Compute/virtualMachineScaleSets/extensions@20
   name: 'windows_exporter_dsc'
 
   parent: vmss
-
   properties: {
     autoUpgradeMinorVersion: false
     enableAutomaticUpgrade: false
-    
-          
     publisher: 'Microsoft.Powershell'
     settings: {
       wmfVersion: 'latest'
@@ -25,9 +20,8 @@ resource vmss_extension 'Microsoft.Compute/virtualMachineScaleSets/extensions@20
         function: 'Setup'
       }
       privacy: {
-      dataCollection: 'false'
-      } 
-
+        dataCollection: 'false'
+      }
     }
     suppressFailures: true
     type: 'DSC'
@@ -35,11 +29,6 @@ resource vmss_extension 'Microsoft.Compute/virtualMachineScaleSets/extensions@20
 
     provisionAfterExtensions: [
       'vmssCSE'
-      
     ]
-    
-    
-
-    
   }
 }
