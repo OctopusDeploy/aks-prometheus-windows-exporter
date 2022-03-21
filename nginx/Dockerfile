@@ -1,12 +1,12 @@
 FROM mcr.microsoft.com/windows/servercore:ltsc2019
+SHELL ["powershell", "-Command"]
+ARG NGINX_VERSION=1.21.6
+RUN $ErrorActionPreference = 'Stop'; \
+    Invoke-WebRequest -Method Get -Uri https://nginx.org/download/nginx-$env:NGINX_VERSION.zip -OutFile c:\nginx-$env:NGINX_VERSION.zip ; \
+    Expand-Archive -Path c:\nginx-$env:NGINX_VERSION.zip -DestinationPath c:\ ; \
+    Remove-Item c:\nginx-$env:NGINX_VERSION.zip -Force
 
-RUN powershell -Command \
-    $ErrorActionPreference = 'Stop'; \
-    Invoke-WebRequest -Method Get -Uri https://nginx.org/download/nginx-1.21.3.zip -OutFile c:\nginx-1.21.3.zip ; \
-    Expand-Archive -Path c:\nginx-1.21.3.zip -DestinationPath c:\ ; \
-    Remove-Item c:\nginx-1.21.3.zip -Force
-
-WORKDIR /nginx-1.21.3
+WORKDIR /nginx-$NGINX_VERSION
 
 RUN mkdir shell
 COPY edit-nginx.conf ./shell

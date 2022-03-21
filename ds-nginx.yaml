@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: nginx-daemon
+  namespace: monitoring
+  labels:
+    app: exporter
+    # labels that match any existing Prometheus ServiceMonitors
+spec:
+  selector:
+    matchLabels:
+      app: exporter
+      # labels that match any existing Prometheus ServiceMonitors
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: exporter
+        # labels that match any existing Prometheus ServiceMonitors
+    spec:
+      hostNetwork: false
+      containers:
+        - name: windows-metric-proxy
+          image: kostapetan.azurecr.io/windows-exporter:v3
+          imagePullPolicy: Always
+          ports:
+            - name: metrics
+              containerPort: 9100
+              protocol: TCP
+          env:
+            - name: PROXY_HOSTIP
+              # this will get the current node's internal IP and forward metric scrapes to the windows-exporter service running on the node
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: PROXY_PORT
+              value: '9100'
+      securityContext:
+        runAsNonRoot: false
+      nodeSelector:
+        kubernetes.io/os: windows
